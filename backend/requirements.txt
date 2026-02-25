@@ -1,0 +1,9 @@
+fastapi>=0.104.0
+uvicorn[standard]
+websockets
+pydantic
+requests
+validators
+tldextract
+python-whois
+httpx
