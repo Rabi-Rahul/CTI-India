@@ -2,11 +2,11 @@
  * Report Threat Page - Incident submission form
  */
 async function renderReportThreat() {
-    const container = document.getElementById('page-container');
-    container.innerHTML = `
+  const container = document.getElementById('page-container');
+  container.innerHTML = `
     <div class="page-header">
       <div>
-        <h2 class="page-title">📝 Report a Cyber Threat</h2>
+        <h2 class="page-title">Report a Cyber Threat</h2>
         <p class="page-subtitle">Submit incident report to CERT-In and NCIIPC for immediate response</p>
       </div>
     </div>
@@ -121,35 +121,17 @@ async function renderReportThreat() {
 
       <!-- Sidebar info -->
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div class="glass-card" style="--card-accent:var(--orange)">
-          <div class="card-inner">
-            <div class="section-title mb16">Response SLA</div>
-            ${[
-            { sev: 'CRITICAL', time: 'Within 1 Hour', color: 'var(--red)' },
-            { sev: 'HIGH', time: 'Within 4 Hours', color: 'var(--orange)' },
-            { sev: 'MEDIUM', time: 'Within 24 Hours', color: 'var(--blue)' },
-            { sev: 'LOW', time: 'Within 72 Hours', color: 'var(--green)' }
-        ].map(r => `
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
-                <span class="badge badge-${r.sev.toLowerCase()}">${r.sev}</span>
-                <span style="font-size:13px;font-weight:600;color:${r.color}">${r.time}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
         <div class="glass-card">
           <div class="card-inner">
             <div class="section-title mb16">Emergency Contacts</div>
             ${[
-            { name: 'CERT-In Helpdesk', num: '1800-11-4949', hrs: '24x7' },
-            { name: 'NCIIPC NOC', num: '+91-11-2430-1900', hrs: '24x7' },
-            { name: 'Cyber Crime Cell', num: '1930', hrs: '24x7' },
-        ].map(c => `
+      { name: 'CERT-In Helpdesk', num: '1800-11-4949' },
+      { name: 'NCIIPC NOC', num: '+91-11-2430-1900' },
+      { name: 'Cyber Crime Cell', num: '1930' },
+    ].map(c => `
               <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
                 <div style="font-size:13px;font-weight:600;color:var(--text-heading)">${c.name}</div>
-                <div style="font-size:16px;font-weight:700;color:var(--green);font-family:var(--font-mono);margin-top:2px">${c.num}</div>
-                <div style="font-size:10px;color:var(--text-muted)">${c.hrs}</div>
+                <div style="font-size:16px;font-weight:700;color:var(--text-secondary);font-family:var(--font-mono);margin-top:2px">${c.num}</div>
               </div>
             `).join('')}
           </div>
@@ -160,45 +142,45 @@ async function renderReportThreat() {
 }
 
 async function submitThreatReport(e) {
-    e.preventDefault();
-    const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="loading-spinner" style="width:18px;height:18px;margin-right:8px"></div> Submitting...';
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="loading-spinner" style="width:18px;height:18px;margin-right:8px"></div> Submitting...';
 
-    const payload = {
-        title: document.getElementById('inc-title').value,
-        description: document.getElementById('inc-description').value,
-        sector: document.getElementById('inc-sector').value,
-        severity: document.getElementById('inc-severity').value,
-        state: document.getElementById('inc-state').value,
-        reporter_name: document.getElementById('rep-name').value,
-        reporter_email: document.getElementById('rep-email').value,
-        contact_number: document.getElementById('rep-phone').value
-    };
+  const payload = {
+    title: document.getElementById('inc-title').value,
+    description: document.getElementById('inc-description').value,
+    sector: document.getElementById('inc-sector').value,
+    severity: document.getElementById('inc-severity').value,
+    state: document.getElementById('inc-state').value,
+    reporter_name: document.getElementById('rep-name').value,
+    reporter_email: document.getElementById('rep-email').value,
+    contact_number: document.getElementById('rep-phone').value
+  };
 
-    await new Promise(r => setTimeout(r, 1500)); // simulate network
+  await new Promise(r => setTimeout(r, 1500)); // simulate network
 
-    const result = (await API.post('/incidents/report', payload)) || {
-        success: true,
-        ticket_id: `INC-${randInt(2025100, 2025999)}`,
-        message: `Incident reported successfully.`
-    };
+  const result = (await API.post('/incidents/report', payload)) || {
+    success: true,
+    ticket_id: `INC-${randInt(2025100, 2025999)}`,
+    message: `Incident reported successfully.`
+  };
 
-    btn.disabled = false;
-    btn.innerHTML = '🚨 Submit Incident Report';
+  btn.disabled = false;
+  btn.innerHTML = 'Submit Incident Report';
 
-    if (result.success) {
-        const banner = document.getElementById('report-success');
-        const msg = document.getElementById('report-success-msg');
-        msg.textContent = `✅ ${result.message} | Ticket: ${result.ticket_id}`;
-        banner.classList.add('show');
-        banner.style.display = 'flex';
-        document.getElementById('threat-report-form').reset();
-        banner.scrollIntoView({ behavior: 'smooth' });
-    }
+  if (result.success) {
+    const banner = document.getElementById('report-success');
+    const msg = document.getElementById('report-success-msg');
+    msg.textContent = `✅ ${result.message} | Ticket: ${result.ticket_id}`;
+    banner.classList.add('show');
+    banner.style.display = 'flex';
+    document.getElementById('threat-report-form').reset();
+    banner.scrollIntoView({ behavior: 'smooth' });
+  }
 }
 
 function showFileNames(input) {
-    const div = document.getElementById('file-names');
-    if (div) div.textContent = [...input.files].map(f => `✓ ${f.name}`).join(' · ');
+  const div = document.getElementById('file-names');
+  if (div) div.textContent = [...input.files].map(f => `✓ ${f.name}`).join(' · ');
 }
